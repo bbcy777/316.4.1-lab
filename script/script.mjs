@@ -30,8 +30,9 @@ function validateUsername(username) {
 
 
 // Registration Form - Email Validation:
-// The email must be a valid email address.
+// The email must be a valid email address. Changed type from tex to email
 // The email must not be from the domain "example.com."
+
 
 // Registration Form - Password Validation:
 // Passwords must be at least 12 characters long.
