@@ -1,50 +1,129 @@
 const errorDisplay = document.getElementById(`errorDisplay`);
-const registrationForm = document.getElementById(`registration`);
+console.log(errorDisplay);
+errorMessage = [];
+
 
 //General Requirements: Whenever any of these validation requirements fail, an appropriate error should be communicated to the user (in most cases, the actual requirement listed below serves as a good error message), and focus should return to the input element that the error originates from. If any requirements fail, the form should not submit.
+function displayError(){
+    errorDisplay.textContent = errorMessage;
+    errorDisplay.style.display = 'block';
+    console.log(errorMessage);
+    setTimeout (function() {
+        errorDisplay.style.display = 'none';
+        errorMessage = [];
+    }, 5000);
+}
 
-const registerUsername = document.querySelector(`#registration [name="username"]`)
-console.log(registerUsername);
 
 // //Part 3: Registration Form Validation Requirements
 // For the Registration Form section of the page, implement the following validation requirements:
+const registrationForm = document.getElementById(`registration`);
+const registerName = registrationForm.elements[`username`];
+const registerEmail = registrationForm.elements[`email`];
+const registerPassword = registrationForm.elements[`password`];
+const registerPassword2 = registrationForm.elements[`passwordCheck`];
+console.log(registrationForm);
+console.log(registerName);
+
+registrationForm.addEventListener(`submit`, (el) =>{  
+    el.preventDefault();
+    validateUsername();
+    validateEmail();
+    validatePassword()
+});
 // Registration Form - Username Validation:
 // The username cannot be blank. In HTML added required attribute.
 // The username must be at least four characters long. minlength="4"
 
-function validateUsername(username) {
 
+function validateUsername() {
+    const usernameValue = registerName.value.trim();
     // The username cannot contain any special characters or whitespace.
-    if(!username.match(/^[a-zA-Z0-9]+$/)){
+    if(!(usernameValue.match(/^[a-zA-Z0-9]+$/))){
+        registerName.focus();
+        errorMessage.push(`The username cannot contain any special characters or whitespace.`);
+        displayError(); 
         return false;
-        focus();
     }
 
     // The username must contain at least two unique characters.
-    const uniqueChars = new Set(username);
+    const uniqueChars = new Set(usernameValue);
     if (uniqueChars.size <2){
+        registerName.focus();
+        errorMessage.push(`The username must contain at least two unique characters.`);
+        displayError();
         return false;
-        focus();
     }
 }
 
 
 // Registration Form - Email Validation:
-// The email must be a valid email address. Changed type from tex to email
+// The email must be a valid email address. Changed type from text to email
 // The email must not be from the domain "example.com."
-
+function validateEmail() {
+    const emailValue = registerEmail.value.trim();
+    if(emailValue.match(/\w+\@example.com$/)){
+        errorMessage.push(`The email must not be from the domain "example.com."`);
+        displayError();
+        return false;
+    }
+}
 
 // Registration Form - Password Validation:
-// Passwords must be at least 12 characters long.
-// Passwords must have at least one uppercase and one lowercase letter.
-// Passwords must contain at least one number.
-// Passwords must contain at least one special character.
-// Passwords cannot contain the word "password" (uppercase, lowercase, or mixed).
-// Passwords cannot contain the username.
-// Both passwords must match.
+function validatePassword() {
+    const passwordValue = registerPassword.value.trim();
+    const passwordCheck = registerPassword2.value.trim();
+    // Passwords must be at least 12 characters long. added minlength
+
+    // Passwords must have at least one uppercase and one lowercase letter.
+    if(!passwordValue.match(/^(?=.*[A-Z])(?=.*[a-z])/)){
+        errorMessage.push(`Passwords must have at least one uppercase and one lowercase letter.`);
+        displayError();
+        return false;
+    }
+
+    // Passwords must contain at least one number.
+    if(!passwordValue.match(/[0-9]+/)){
+        errorMessage.push(`Passwords must contain at least one number.`);
+        displayError();
+        return false;
+    }
+    // Passwords must contain at least one special character.
+    const specailChar = /.*[!@#$%^&*()_+{}\[\]:;<>,.?/\\~-].*/;
+    if(!passwordValue.match(specailChar)){
+        errorMessage.push(`Passwords must contain at least one special character.`);
+        displayError();
+        return false;
+    }
+
+    // Passwords cannot contain the word "password" (uppercase, lowercase, or mixed).
+    const regex = /password/i;
+   
+    if(passwordValue.match(regex)){
+        errorMessage.push(`Passwords cannot contain the word "password" (uppercase, lowercase, or mixed).`);
+        displayError();
+        return false;
+    }
+
+    // Passwords cannot contain the username.???????????????????????????????????????????????????????????
+    const usernameValue = registerName.value.trim();
+    const userRegex = new RegExp('^(?:.*?${usernameValue}).*$');
+    if(passwordValue.match(userRegex)){
+        errorMessage.push(`Passwords cannot contain the username.`);
+        displayError();
+        return false;
+    }
+
+    // Both passwords must match.
+    if(passwordValue !== passwordCheck){
+        errorMessage.push(`Both passwords must match`);
+        displayError();
+        return false;
+    }
+}
 
 // Registration Form - Terms and Conditions:
-// The terms and conditions must be accepted.
+// The terms and conditions must be accepted. added requried attribute.
 
 // Registration Form - Form Submission:
 // Usually, we would send this information to an external API for processing. In our case, we are going to process and store the data locally for practice purposes.
@@ -58,6 +137,8 @@ function validateUsername(username) {
 // Registration Form - Username Validation (Part Two):
 // Now that we are storing usernames, create an additional validation rule for them...
 // Usernames must be unique ("that username is already taken" error). Remember that usernames are being stored all lowercase, so "learner" and "Learner" are not unique.
+
+
 // Part 4: Login Form Validation Requirements
 // For the Login Form section of the page, implement the following validation requirements:
 // Login Form - Username Validation:
