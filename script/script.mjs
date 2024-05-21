@@ -22,22 +22,32 @@ const registerName = registrationForm.elements[`username`];
 const registerEmail = registrationForm.elements[`email`];
 const registerPassword = registrationForm.elements[`password`];
 const registerPassword2 = registrationForm.elements[`passwordCheck`];
-console.log(registrationForm);
-console.log(registerName);
+// console.log(registrationForm);
+// console.log(registerName);
+const usernameValue = registerName.value.trim();
+const emailValue = registerEmail.value.trim();
+const passwordValue = registerPassword.value.trim();
+
+const users = [];
+const user = {};
 
 registrationForm.addEventListener(`submit`, (el) =>{  
     el.preventDefault();
-    validateUsername();
-    validateEmail();
-    validatePassword()
+    if(validateForm()){
+        localStorage.setItem(`name`, usernameValue);
+        localStorage.setItem(`email`, emailValue);
+        localStorage.setItem(`password`, passwordValue);
+        users.push({`name`:usernameValue, `email`: emailValue, `password`: passwordValue})
+    };
+
 });
 // Registration Form - Username Validation:
 // The username cannot be blank. In HTML added required attribute.
 // The username must be at least four characters long. minlength="4"
 
 
-function validateUsername() {
-    const usernameValue = registerName.value.trim();
+function validateForm() {
+
     // The username cannot contain any special characters or whitespace.
     if(!(usernameValue.match(/^[a-zA-Z0-9]+$/))){
         registerName.focus();
@@ -54,24 +64,21 @@ function validateUsername() {
         displayError();
         return false;
     }
-}
 
 
 // Registration Form - Email Validation:
 // The email must be a valid email address. Changed type from text to email
 // The email must not be from the domain "example.com."
-function validateEmail() {
-    const emailValue = registerEmail.value.trim();
+
+
     if(emailValue.match(/\w+\@example.com$/)){
         errorMessage.push(`The email must not be from the domain "example.com."`);
         displayError();
         return false;
     }
-}
 
 // Registration Form - Password Validation:
-function validatePassword() {
-    const passwordValue = registerPassword.value.trim();
+    
     const passwordCheck = registerPassword2.value.trim();
     // Passwords must be at least 12 characters long. added minlength
 
@@ -105,9 +112,8 @@ function validatePassword() {
         return false;
     }
 
-    // Passwords cannot contain the username.???????????????????????????????????????????????????????????
-    const usernameValue = registerName.value.trim();
-    const userRegex = new RegExp('^(?:.*?${usernameValue}).*$');
+    // Passwords cannot contain the username.
+    const userRegex = new RegExp(`^(?:.*?${usernameValue}).*$`);
     if(passwordValue.match(userRegex)){
         errorMessage.push(`Passwords cannot contain the username.`);
         displayError();
@@ -130,6 +136,10 @@ function validatePassword() {
 // If all validation is successful, store the username, email, and password using localStorage.
 // If you are unfamiliar with localStorage, that is okay! Reference the documentation's "Description" and "Examples" sections to learn how to implement it. If you run into issues speak with a peer or one of your instructors.
 // Consider how you want to store the user data, keeping in mind that there will be quite a few users registering for the site. Perhaps you want to store it with an array of user objects; or maybe an object whose keys are the usernames themselves.
+
+
+
+
 // Valid usernames should be converted to all lowercase before being stored.
 // Valid emails should be converted to all lowercase before being stored.
 // Clear all form fields after successful submission and show a success message.
