@@ -24,30 +24,50 @@ const registerPassword = registrationForm.elements[`password`];
 const registerPassword2 = registrationForm.elements[`passwordCheck`];
 // console.log(registrationForm);
 // console.log(registerName);
-const usernameValue = registerName.value.trim();
-const emailValue = registerEmail.value.trim();
-const passwordValue = registerPassword.value.trim();
+
 
 const users = [];
-const user = {};
+
 
 registrationForm.addEventListener(`submit`, (el) =>{  
     el.preventDefault();
-    if(validateForm()){
-        localStorage.setItem(`name`, usernameValue);
-        localStorage.setItem(`email`, emailValue);
-        localStorage.setItem(`password`, passwordValue);
-        users.push({`name`:usernameValue, `email`: emailValue, `password`: passwordValue})
+    const usernameValue = registerName.value.toLowerCase().trim();
+    const emailValue = registerEmail.value.toLowerCase().trim();
+    const passwordValue = registerPassword.value.trim();
+    const user = {
+        name: usernameValue,
+        email: emailValue,
+        password: passwordValue
     };
 
+    //check if username is taken
+    if(UsernameTaken(usernameValue)){
+        alert(`that username is already taken`);
+        return;
+    }
+    if(validateForm()){
+        console.log(validateForm());
+        localStorage.setItem(`user`, JSON.stringify(user));
+        console.log(user);
+        users.push(user);
+
+        alert(`Registration Complete!`)
+
+        // Reset the form to clear all fields
+        registrationForm.reset();
+    }
+    console.log(users);
 });
+
 // Registration Form - Username Validation:
 // The username cannot be blank. In HTML added required attribute.
 // The username must be at least four characters long. minlength="4"
 
 
 function validateForm() {
-
+    const usernameValue = registerName.value.trim();
+    const emailValue = registerEmail.value.trim();
+    const passwordValue = registerPassword.value.trim();
     // The username cannot contain any special characters or whitespace.
     if(!(usernameValue.match(/^[a-zA-Z0-9]+$/))){
         registerName.focus();
@@ -64,7 +84,6 @@ function validateForm() {
         displayError();
         return false;
     }
-
 
 // Registration Form - Email Validation:
 // The email must be a valid email address. Changed type from text to email
@@ -126,6 +145,8 @@ function validateForm() {
         displayError();
         return false;
     }
+    // If all validations pass, return true
+    return true;
 }
 
 // Registration Form - Terms and Conditions:
@@ -147,21 +168,56 @@ function validateForm() {
 // Registration Form - Username Validation (Part Two):
 // Now that we are storing usernames, create an additional validation rule for them...
 // Usernames must be unique ("that username is already taken" error). Remember that usernames are being stored all lowercase, so "learner" and "Learner" are not unique.
-
+function UsernameTaken(name) {
+    return users.some(row => row.name == name.toLowerCase());
+}
 
 // Part 4: Login Form Validation Requirements
 // For the Login Form section of the page, implement the following validation requirements:
-// Login Form - Username Validation:
-// The username cannot be blank.
-// The username must exist (within localStorage). Remember that usernames are stored in all lowercase, but the username field accepts (and should not invalidate) mixed-case input.
 
+const loginForm = document.getElementById(`login`);
+const loginName = loginForm.elements[`username`];
+const loginPassword = loginForm.elements[`password`]
+
+console.log(loginName.parentElement);
+console.log(loginName);
+
+// Login Form - Form Submission:
+loginForm.addEventListener(`submit`, (el) =>{
+    el.preventDefault();
+
+    // If "Keep me logged in" is checked, modify the success message to indicate this (normally, this would be handled by a variety of persistent login tools and technologies).
+    // If all validation is successful, clear all form fields and show a success message.
+    const checkBox = loginForm.elements[`persist`];
+    if(loginValidation() && checkBox.checked){
+        alert(`Login successful and keep me logged in`);
+        loginForm.reset();
+    }else if(loginValidation()){
+        alert(`Login successful!`)
+        loginForm.reset();
+    }else{
+        alert(`wrong user information`)
+    }})
+// Login Form - Username Validation:
+// The username cannot be blank. added required.
+// The username must exist (within localStorage). Remember that usernames are stored in all lowercase, but the username field accepts (and should not invalidate) mixed-case input.
 // Login Form - Password Validation:
 // The password cannot be blank.
 // The password must be correct (validate against localStorage).
 
-// Login Form - Form Submission:
-// If all validation is successful, clear all form fields and show a success message.
-// If "Keep me logged in" is checked, modify the success message to indicate this (normally, this would be handled by a variety of persistent login tools and technologies).
+function loginValidation(){
+    const loginNameValue = loginName.value.toLowerCase();
+    const loginPasswordValue = loginPassword.value;
+    for (let i = 0; i<users.length; i++){
+        if(loginNameValue == users[i].name && loginPasswordValue == users[i].password){
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
 // Part 5: Completion
 // Test your validation thoroughly! Try to break things!
 // Remember that each successful registration should be stored; therefore you should be able to login with a variety of account credentials.
